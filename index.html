@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>kimi · 投资</title>
+<link rel="stylesheet" href="fund.css?v=68">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+<script src="fund-data.js?v=68"></script>
+<script type="text/babel" src="agents-v2.jsx?v=68"></script>
+<script type="text/babel" src="persona.jsx?v=68"></script>
+<script type="text/babel" src="onboard.jsx?v=68"></script>
+<script type="text/babel" src="office.jsx?v=68"></script>
+<script type="text/babel" src="office-scene.jsx?v=68"></script>
+<script type="text/babel" src="dashboard.jsx?v=68"></script>
+<script type="text/babel" src="briefing.jsx?v=68"></script>
+<script type="text/babel" src="chat.jsx?v=68"></script>
+
+<script type="text/babel">
+const{useState,useEffect}=React;
+const{TopBar,DailyBriefing,PerfCard,NavValueCard,Watchlist,ChatDock,Onboarding,EmptyRail,AdvisorFab,OfficeFloor,TeamOffice,CompanyArchive,CollabReplay}=window;
+function App(){
+  const openChat=(a)=>window.dispatchEvent(new CustomEvent('ta-openchat',{detail:a}));
+  const[showOb,setShowOb]=useState(()=>!localStorage.getItem('ta-seen'));
+  const[hasPf,setHasPf]=useState(()=>localStorage.getItem('ta-portfolio')==='1'||!localStorage.getItem('ta-seen'));
+  const[tab,setTab]=useState(()=>localStorage.getItem('ta-hubtab')||'brief');
+  const[tview,setTview]=useState(()=>localStorage.getItem('ta-teamview')||'office');
+  const setTabP=(v)=>{setTab(v);localStorage.setItem('ta-hubtab',v);};
+  const setTviewP=(v)=>{setTview(v);localStorage.setItem('ta-teamview',v);};
+  useEffect(()=>{
+    const h=()=>{localStorage.setItem('ta-ob-step','0');setHasPf(true);setTabP('brief');setShowOb(true);};
+    const g=(e)=>setTabP(e.detail);
+    window.addEventListener('ta-onboard',h);window.addEventListener('ta-gotab',g);
+    return()=>{window.removeEventListener('ta-onboard',h);window.removeEventListener('ta-gotab',g);};
+  },[]);
+  const finishOb=()=>{localStorage.setItem('ta-seen','1');localStorage.setItem('ta-portfolio','1');setHasPf(true);setShowOb(false);setTabP('brief');};
+  return(
+    <>
+      {showOb&&<Onboarding page="invest" onDone={finishOb}/>}
+      <TopBar page="dash"/>
+      <div className="wrap">
+        <div className="pg-seg">
+          <button className={`pg-seg-btn${tab==='brief'?' on':''}`} onClick={()=>setTabP('brief')}>今日简报</button>
+          <button className={`pg-seg-btn${tab==='team'?' on':''}`} onClick={()=>setTabP('team')} data-tour="seg-team">投研团队</button>
+        </div>
+        {tab==='brief'?(
+          <div className="dash-grid">
+            <div className="dash-main">
+              <DailyBriefing onChat={openChat} hasPortfolio={hasPf}/>
+            </div>
+            <div className="dash-rail">
+              {hasPf?<React.Fragment><PerfCard/><NavValueCard/><Watchlist/></React.Fragment>:<EmptyRail/>}
+            </div>
+          </div>
+        ):(
+          <div className="team-view">
+            <div className="sec-hd" style={{margin:'2px 0 16px'}}>
+              <div>
+                <div className="sec-h">投研团队</div>
+                <div className="sec-sub" style={{marginTop:3}}>1 组合经理 · 6 分析师 · 1 复盘官 · 每只标的一位常驻分析师</div>
+              </div>
+              <div className="team-toggle" data-tour="team-toggle">
+                <button className={`tt-btn${tview==='office'?' on':''}`} onClick={()=>setTviewP('office')}>办公室</button>
+                <button className={`tt-btn${tview==='cards'?' on':''}`} onClick={()=>setTviewP('cards')}>团队管理 · 人物设定</button>
+              </div>
+            </div>
+            {tview==='office'?<OfficeFloor onChat={openChat}/>:<TeamOffice onSelect={openChat} selected={null}/>}
+            <CompanyArchive onSelect={openChat}/>
+            <CollabReplay/>
+          </div>
+        )}
+      </div>
+      <ChatDock/>
+      <AdvisorFab/>
+    </>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
