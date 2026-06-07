@@ -62,6 +62,7 @@ function Onboarding({onDone,page}){
     const place=()=>{const el=find();if(!el)return;const r=el.getBoundingClientRect();setBox({left:r.left,top:r.top,width:r.width,height:r.height});};
     doScroll();place();
     const ts=[60,180,360,600,900].map(d=>setTimeout(()=>{doScroll();place();},d));
+    let tries=0,iv=setInterval(()=>{const el=find();if(el){doScroll();place();clearInterval(iv);}else if(++tries>26){clearInterval(iv);}},140);
     const onResize=()=>{doScroll();place();};
     window.addEventListener('resize',onResize);
     let bound=null,done=false;const go=()=>{if(done)return;done=true;setTimeout(()=>advance(),90);};
@@ -69,7 +70,7 @@ function Onboarding({onDone,page}){
     if(step.action){const bind=()=>{const el=find();if(el&&el!==bound){if(bound)bound.removeEventListener('click',onTargetClick);bound=el;el.addEventListener('click',onTargetClick);}};bind();ts.push(setTimeout(bind,150),setTimeout(bind,450));}
     let evt=null;
     if(step.advanceEvent){evt=()=>go();window.addEventListener(step.advanceEvent,evt);}
-    return()=>{ts.forEach(clearTimeout);window.removeEventListener('resize',onResize);if(bound)bound.removeEventListener('click',onTargetClick);if(evt)window.removeEventListener(step.advanceEvent,evt);};
+    return()=>{ts.forEach(clearTimeout);clearInterval(iv);window.removeEventListener('resize',onResize);if(bound)bound.removeEventListener('click',onTargetClick);if(evt)window.removeEventListener(step.advanceEvent,evt);};
     // eslint-disable-next-line
   },[i]);
 
@@ -94,6 +95,10 @@ function Onboarding({onDone,page}){
     else{top=Math.max(12,window.innerHeight-tipH-12);}
     let left=box.left;left=Math.max(16,Math.min(left,window.innerWidth-tipW-16));
     tipStyle={left,width:tipW,top,transform};
+  }else{
+    // target not located yet — show the tooltip centered so the tour never becomes a blank dim
+    const tipW=Math.min(360,window.innerWidth-32);
+    tipStyle={left:Math.round((window.innerWidth-tipW)/2),width:tipW,top:Math.max(16,Math.round(window.innerHeight*0.5-120)),transform:'none'};
   }
 
   // global progress across both pages

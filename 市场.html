@@ -4,26 +4,26 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>kimi · 市场</title>
-<link rel="stylesheet" href="fund.css?v=68">
+<link rel="stylesheet" href="fund.css?v=69">
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 </head>
 <body>
 <div id="root"></div>
-<script src="fund-data.js?v=68"></script>
-<script type="text/babel" src="agents-v2.jsx?v=68"></script>
-<script type="text/babel" src="persona.jsx?v=68"></script>
-<script type="text/babel" src="onboard.jsx?v=68"></script>
-<script type="text/babel" src="dashboard.jsx?v=68"></script>
-<script type="text/babel" src="chat.jsx?v=68"></script>
-<script type="text/babel" src="market.jsx?v=68"></script>
+<script src="fund-data.js?v=69"></script>
+<script type="text/babel" src="agents-v2.jsx?v=69"></script>
+<script type="text/babel" src="persona.jsx?v=69"></script>
+<script type="text/babel" src="onboard.jsx?v=69"></script>
+<script type="text/babel" src="dashboard.jsx?v=69"></script>
+<script type="text/babel" src="chat.jsx?v=69"></script>
+<script type="text/babel" src="market.jsx?v=69"></script>
 
 <script type="text/babel">
 const{useState,useEffect}=React;
 const{TopBar,MarketPage,ChatDock,AdvisorFab,Onboarding}=window;
 function App(){
-  const[showOb,setShowOb]=useState(()=>!localStorage.getItem('ta-seen'));
+  const[showOb,setShowOb]=useState(()=>!localStorage.getItem('ta-seen')||localStorage.getItem('ta-ob-step')!==null);
   useEffect(()=>{
     const h=()=>{localStorage.setItem('ta-ob-step','0');setShowOb(true);};
     window.addEventListener('ta-onboard',h);return()=>window.removeEventListener('ta-onboard',h);
